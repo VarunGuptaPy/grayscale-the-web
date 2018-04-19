@@ -1,0 +1,37 @@
+{
+	"manifest_version": 2,
+	"name": "GrayScale - Save Sites",
+	"description": "Save sites you would like to appear as grayscale.",
+	"version": "1.0",
+	"author": "Kyle Damken",
+	"background": {
+		"scripts": [
+			"js/manageSites.js", "js/background.js"
+		],
+		"persistent": false
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"*://*/*"
+			],
+			"js": [
+				"js/content.js"
+			]
+		}
+	],
+	"icons": {
+		"128": "img/spip-on.png"		
+	},
+	"browser_action": {
+		"default_icon": {
+			"128": "img/spip-off.png"
+		},
+		"default_title": "GrayScale Yay Scale",
+		"default_popup": "popup.html"
+	},
+	"permissions": [
+		"storage",
+		"tabs"
+	]
+}

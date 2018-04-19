@@ -1,0 +1,109 @@
+<!doctype html>
+<!--
+ This page is shown when the extension button is clicked, because the
+ "browser_action" field in manifest.json contains the "default_popup" key with
+ value "popup.html".
+ -->
+<html>
+
+<head>
+  <title>Grayscale - Save</title>
+  <style>
+    body {
+      font-family: "Lucida Grande", Tahoma, sans-serif;
+      font-size: 100%;
+      margin: 0 10px 10px 10px;
+      width: 118px;
+    }
+
+    .preload *, .preload *:before, .preload *:after {
+      transition: none !important;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    ul {
+      padding-left: 0;
+    }
+    li {
+      font-size: 12px;
+    }
+
+    .toggle {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 62px;
+      height: 32px;
+      display: inline-block;
+      position: relative;
+      margin: 0;
+      border-radius: 50px;
+      overflow: hidden;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      background-color: #707070;
+      transition: background-color ease 0.3s;
+    }
+
+    .toggle:before {
+      content: "on off";
+      display: block;
+      position: absolute;
+      z-index: 2;
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      font: 10px/28px Helvetica;
+      text-transform: uppercase;
+      font-weight: bold;
+      text-indent: -22px;
+      word-spacing: 37px;
+      color: #fff;
+      text-shadow: -1px -1px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+    }
+
+    .toggle:checked {
+      background-color: #1bb76e;
+    }
+
+    .toggle:checked:before {
+      left: 32px;
+    }
+  </style>
+</head>
+
+<body class="preload">
+  <h1>Grayscale - Save</h1>
+
+  For Just This Tab<br>
+  <!-- <input class="toggle" type="checkbox" checked/> -->
+
+  For All Sites<br>
+  <input class="toggle toggle-all" type="checkbox" checked/>
+  <br>
+  Save this site?<br>
+  <button class="add-site">Add Site</button>
+  <button class="remove-site">Remove Site</button>
+  <br>
+  Dev stuff<br>
+  <button class="show-site-values">Show Site Values</button>
+  <button class="clear-site-values">Clear Site Values</button>
+
+  <ul class="site-list"></ul>
+
+  <script type="text/javascript" src="js/manageSites.js"></script>
+  <script type="text/javascript" src="js/popup.js">
+  </script>
+</body>
+
+</html>
