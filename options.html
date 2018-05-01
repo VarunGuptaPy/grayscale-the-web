@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Grayscale - Save</title>
+  <link rel="stylesheet" type="text/css" href="css/options.css">
+</head>
+
+<body class="preload">
+  <div class="container">
+  
+  <h1>Grayscale - Manage Saved Sites</h1>
+  <p>Use the form below to manually save sites you would like grayscaled. Make sure to add the site name with the end part after the ".", like a .com or a .gov, otherwise your entry won't work, even if it's appears in the list.
+  <p>Example: If you wanted to add www.google.com, you just need to enter google.com. If you just enter "google", it will appear in the list, but it won't work.</p>
+  <p>Please note that subdomains won't work with this. So if you add something like "pictures.facebook.com", it will just add "facebook.com". The grayscale will then work for any site with facebook.com<p>
+  <p>If all of this is too confusing, it may be easier to add/remove sites using the pop up menu as you go by clicking the Grayscale icon in your chrome menu bar.</p>
+  
+  <form id="add-site-form" action="">
+    <input type="text" id="new-site" class="site-input" placeholder="Add Site Here">
+    <button id="save-new-site" class="save-button">Save New Site</button>
+  </form>    
+
+  <ul id="site-list"></ul>  
+
+  <button id="clear-site-values" class="save-button clear-button">Remove All Saved Sites</button>
+  </div>
+    
+  <script type="text/javascript" src="js/manageSites.js"></script>  
+  <script src="js/options.js"></script>  
+</body>
+
+</html>

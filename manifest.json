@@ -16,10 +16,12 @@
 				"*://*/*"
 			],
 			"js": [
-				"js/content.js"
-			]
+				"js/manageSites.js", "js/content.js"
+			],
+			"run_at": "document_start"
 		}
 	],
+	"options_page": "options.html",
 	"icons": {
 		"128": "img/spip-on.png"		
 	},

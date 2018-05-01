@@ -1,0 +1,106 @@
+body {
+    font-family: "Lucida Grande", Tahoma, sans-serif;
+    font-size: 100%;
+    margin: 0;  
+}
+
+.container {
+    margin: 0 auto 30px;;    
+    width: 90%;
+}
+
+@media only screen and (min-width: 768px) {
+    .container {
+        width: 750px;
+    }
+}
+h1 {
+    font-size: 20px;
+    font-weight: 400;
+}
+p, span {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#add-site-form {
+    padding-top: 30px;
+    border-top: 1px solid lightgray;
+}
+
+.site-input {
+    display: inline-block;
+    max-width: 200px;
+    font-size: 16px;
+    line-height: 35px;
+    padding: 0 10px 0;
+    border-radius: 5px;
+    border: 1px solid lightgray;
+    -webkit-appearance: none;
+    /* border:  */
+    width: 100%;        
+    transition: .3s border-color;
+}
+
+.site-input:focus {
+    outline: 0;
+    border: 1px solid #1587C6;
+}
+
+.save-button {
+    display: inline-block;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-left: 2px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    line-height: 35px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #0375B4;
+    color: #fff;
+    transition: 0.3s background-color;
+}
+
+.save-button:hover, .save-button:focus {
+    background: #1587C6;
+    outline: 0;
+} 
+
+.clear-button {
+    background-color: #e23636;
+}
+
+.clear-button:hover, .clear-button:focus {
+    background-color: #F44848;
+} 
+
+.remove-button {
+    display: inline-block;
+    padding: 0 5px;
+    margin-left: 2px;
+    border: 0;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #e23636;
+    transition: 0.3s color;
+}
+
+.remove-button:hover, .remove-button:focus {
+    color: #F44848;
+} 
+
+ul {
+    padding-left: 0;
+    list-style-type: none;
+}
+li {
+    font-size: 14px;
+    margin: 0;
+    padding: 7px 0;
+    border-bottom: 1px solid lightgray;
+}
+li:last-of-type {
+    border: 0;
+}

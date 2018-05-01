@@ -13,7 +13,7 @@
       font-family: "Lucida Grande", Tahoma, sans-serif;
       font-size: 100%;
       margin: 0 10px 10px 10px;
-      width: 118px;
+      width: 160px;
     }
 
     .preload *, .preload *:before, .preload *:after {
@@ -23,6 +23,19 @@
     h1 {
       font-size: 16px;
       font-weight: 400;
+    }
+
+    p, span, a {
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 400;
+    }
+
+    .ellipsis {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      display: block;
+      overflow: hidden;
     }
 
     ul {
@@ -79,27 +92,40 @@
     .toggle:checked:before {
       left: 32px;
     }
+
+    .add-remove-container #add-site {
+      display: inline-block;
+    }
+    .add-remove-container #remove-site {
+      display: none;
+    }
+    .add-remove-container--remove #add-site {
+      display: none;
+    }
+    .add-remove-container--remove #remove-site {
+      display: inline-block;
+    }
   </style>
 </head>
 
 <body class="preload">
   <h1>Grayscale - Save</h1>
 
-  For Just This Tab<br>
+  For Just This Tab<br>  
   <!-- <input class="toggle" type="checkbox" checked/> -->
-
+  <br>
   For All Sites<br>
   <input class="toggle toggle-all" type="checkbox" checked/>
   <br>
-  Save this site?<br>
-  <button class="add-site">Add Site</button>
-  <button class="remove-site">Remove Site</button>
-  <br>
-  Dev stuff<br>
-  <button class="show-site-values">Show Site Values</button>
-  <button class="clear-site-values">Clear Site Values</button>
-
-  <ul class="site-list"></ul>
+  <p>
+    <span id="site-name" class="ellipsis"></span>
+    <span id="site-status">is saved<br>Save this site?</span>
+  </p>
+  <div class="add-remove-container">
+    <button id="add-site">Add Site</button>
+    <button id="remove-site">Remove Site</button>
+  </div>  
+  <a href="#" class="manage-sites">Manage Saved Sites</a>
 
   <script type="text/javascript" src="js/manageSites.js"></script>
   <script type="text/javascript" src="js/popup.js">

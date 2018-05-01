@@ -1,34 +1,41 @@
 function updateStatus() {
-    var storage = chrome.storage.sync;
     var checkbox = document.querySelector('.toggle-all');
-    storage.get('gsAll', function (val) {
+    chrome.storage.sync.get(['gsAll', 'gsSites'], function (val) {
         if (val.gsAll) {
             checkbox.checked = false;
-            storage.set({ 'gsAll': false });
+            chrome.storage.sync.set({ 'gsAll': false });
+            // 'if site is added, don't remove it for this one'
             chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
-                // need to check url to base if we're going to turn it off here???
-                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
+                var hostname = getDomainFromTabs(tabs);
+                // console.log('hostname in popup', hostname);
+                if (val.gsSites.indexOf(hostname) == -1) {
+                    console.log('its not there', val.gsSites.indexOf(hostname));
+                    chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
+                    turnIconOff();
+                }
             });
         } else {
             checkbox.checked = true;
-            storage.set({ 'gsAll': true });            
+            chrome.storage.sync.set({ 'gsAll': true });            
             chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
                 chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
+                turnIconOn();
             });
         }
     });
 }
 
-function onLoad() {
-    var checkbox = document.querySelector('.toggle');
+function openOptionsPage() {
+    if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+    } else {
+        window.open(chrome.runtime.getURL('options.html'));
+    }
+}
+
+function onLoad() {    
     var bodyEl = document.querySelector('body');
-    chrome.storage.sync.get('gsAll', function (val) {
-        if (val.gsAll) {
-            checkbox.checked = true;
-        } else {
-            checkbox.checked = false;
-        }
-    });
+    updatePopUpDetails()
     setTimeout(() => {
         bodyEl.classList.remove('preload');
     }, 50);
@@ -37,9 +44,7 @@ function onLoad() {
 onLoad();
 document.querySelector('.toggle-all').addEventListener('change', updateStatus)
 
-document.querySelector('.add-site').addEventListener('click', addSite)
-document.querySelector('.remove-site').addEventListener('click', removeSite)
-document.querySelector('.show-site-values').addEventListener('click', showSiteValues)
-document.querySelector('.clear-site-values').addEventListener('click', clearSiteValues)
+document.getElementById('add-site').addEventListener('click', addCurrentSite)
+document.getElementById('remove-site').addEventListener('click', removeCurrentSite)
 
-document.querySelector('.all-sites').addEventListener('click', allSites)
+document.querySelector('.manage-sites').addEventListener('click', openOptionsPage)

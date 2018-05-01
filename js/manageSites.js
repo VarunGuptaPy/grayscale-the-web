@@ -1,99 +1,199 @@
-function coolBeans () {
-    console.log('cool beans');
+function checkCurrentSite(siteUrl) {
+    console.log('check current site run')
+    chrome.storage.sync.get(['gsSites', 'gsAll'], function (val) {
+        // console.log('val.gsSites', val.gsSites);
+        // console.log('val.gsAll', val.gsAll);
+        var hostname = extractRootDomain(siteUrl);
+        console.log('activated url', hostname)
+        if (val.gsAll) {
+            console.log('turn on gray first')
+            currentSite.querySelector('html').style.filter = "grayscale(100%)";
+        } else if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
+            console.log('site active')
+            console.log('turn on gray first')
+            currentSite.querySelector('html').style.filter = "grayscale(100%)";
+        } else {
+            console.log('site not active')
+            console.log('turn off gray first')
+            console.log('chrome.browserAction', chrome.browserAction)
+            currentSite.querySelector('html').style.filter = "";
+        }
+    });
 }
 
-function addSite() {
-    console.log('add site')
+function addSite(site, tabs, callback) {
+    chrome.storage.sync.get('gsSites', function (val) {
+        console.log('gsSites', val)
+        if (!val.gsSites || val.gsSites.length < 1) {
+            console.log('gsSites doesnt exist yet, lets add it');
+            chrome.storage.sync.set({ 'gsSites': [site] }, function () {
+                callback();
+            });
+        } else if (val.gsSites.indexOf(site) > -1) {
+            console.log('sites is already added there')
+        } else {
+            console.log('site not there, add it')
+            var newSiteList = val.gsSites;
+            newSiteList.push(site);
+            newSiteList.sort();
+            console.log('newSiteList', newSiteList)
+            chrome.storage.sync.set({ 'gsSites': newSiteList }, function () {
+                callback();
+            });
+        }
+    });
+}
+
+function addCurrentSite() {
+    console.log('add current site')
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
-        var url = tabs[0].url;
-        console.log('tabs0', tabs[0])
-        console.log('url', url)
-        var hostname = extractRootDomain(url);
-        console.log('hostname', hostname);
-        chrome.storage.sync.get('gsSites', function (val) {
-            console.log('gsSites', val)
-            if (!val.gsSites || val.gsSites.length < 1) {
-                console.log('gsSites doesnt exist yet, lets add it');
-                chrome.storage.sync.set({ 'gsSites': [hostname] });
-                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
-            } else if (val.gsSites.indexOf(hostname) > -1) {
-                console.log('sites is already added there')
-            } else {
-                console.log('site not there, add it')
-                var newSiteList = val.gsSites;
-                newSiteList.push(hostname);
-                console.log('newSiteList', newSiteList)
-                chrome.storage.sync.set({ 'gsSites': newSiteList }, function (result) {
-                    console.log('result', result);
-                });
-                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
-            }
+        var hostname = getDomainFromTabs(tabs);
+        addSite(hostname, tabs, function () {
+            chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
+            turnIconOn();
+            updatePopUpDetails();
         });
     });
 }
 
-function removeSite() {
-    console.log('remove site')
-    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
-        var url = tabs[0].url;
-        console.log('tabs0', tabs[0])
-        console.log('url', url)
-        var hostname = extractRootDomain(url);
-        console.log('hostname', hostname)
-        chrome.storage.sync.get('gsSites', function (val) {
-            console.log('gsSites', val);
-            // storage.set({ 'gsSites': [hostname] });
-            if (!val.gsSites) {
-                console.log('gsSites doesnt exist yet do nothing');
-                // storage.set({ 'gsSites': [hostname] });
-            } else if (val.gsSites.indexOf(hostname) > -1) {
-                console.log('sites is already added there, remove it')
-                var newSiteList = val.gsSites;
-                var index = newSiteList.indexOf(hostname);
-                newSiteList.splice(index, 1);
-                console.log('newSiteList', newSiteList)
-                chrome.storage.sync.set({ 'gsSites': newSiteList });
+function addSiteToList(e) {
+    e.preventDefault();
+    console.log('form go')
+    var newSite = document.getElementById('new-site');
+    var newDomain = extractRootDomain(newSite.value);
+    addSite(newDomain, false, updateOptionsSiteList);
+    newSite.value = '';
+    newSite.blur();
+    newSite.focus();
+}
+
+function removeSite(site, tabs, callback){
+    chrome.storage.sync.get('gsSites', function (val) {
+        console.log('gsSites', val);
+        if (!val.gsSites) {
+            console.log('gsSites doesnt exist yet do nothing');
+        } else if (val.gsSites.indexOf(site) > -1) {
+            console.log('sites is already added there, remove it')
+            var newSiteList = val.gsSites;
+            var index = newSiteList.indexOf(site);
+            newSiteList.splice(index, 1);
+            console.log('newSiteList', newSiteList)
+            chrome.storage.sync.set({ 'gsSites': newSiteList }, function (){
+                if(callback) {
+                    callback()
+                }
+            });
+            if (tabs) {
                 chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
+                turnIconOff();
+            }                        
+        } else {
+            console.log('site not there, do nothing')
+        }
+    });
+}
+
+function removeCurrentSite() {
+    console.log('remove current site')
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        var url = tabs[0].url;
+        var hostname = extractRootDomain(url);
+        removeSite(hostname, tabs, updatePopUpDetails);
+    });
+}
+
+function removeSiteFromList(e) {
+    var siteName = e.target.getAttribute('data-site');
+    removeSite(siteName, false, updateOptionsSiteList);
+}
+
+function updatePopUpDetails() {
+    var checkbox = document.querySelector('.toggle');
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        var hostname = getDomainFromTabs(tabs);
+        var siteTitle = document.getElementById('site-name');
+        siteTitle.innerHTML = hostname;
+        var siteStatus = document.getElementById('site-status');
+        var addRemoveContainer = document.querySelector('.add-remove-container');
+        chrome.storage.sync.get(['gsAll', 'gsSites'], function (val) {
+            if (val.gsAll) {
+                checkbox.checked = true;
             } else {
-                console.log('site not there, do nothing')
-                // var newSiteList = val.gsSites;
-                // newSiteList.push(hostname);
-                // console.log('newSiteList', newSiteList)
-                // chrome.storage.sync.set({ 'gsSites': newSiteList }, function (result) {
-                //     console.log('result', result);
-                // });
+                checkbox.checked = false;
+            }
+            if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
+                siteStatus.innerHTML = 'is saved.<br>Remove this site?'
+                addRemoveContainer.classList.add('add-remove-container--remove');
+            } else {
+                siteStatus.innerHTML = 'is not saved.<br>Save this site?'
+                addRemoveContainer.classList.remove('add-remove-container--remove');
             }
         });
     });
 }
 
-function showSiteValues(tabs) {
+// **************
+// Toggle icon functions
+// **************
+
+function turnIconOn() {
+    chrome.browserAction.setIcon({
+        path: "../img/spip-on.png"
+    });
+}
+
+function turnIconOff() {
+    chrome.browserAction.setIcon({
+        path: "../img/spip-off.png"
+    });
+}
+
+// **************
+// Clear and Show
+// **************
+
+// options.js, and here in others
+function updateOptionsSiteList() {
     chrome.storage.sync.get('gsSites', function (val) {
         console.log('showing gsSites', val.gsSites);        
-        var ul = document.querySelector('.site-list');
+        var ul = document.getElementById('site-list');
         ul.innerHTML = "";
 
         if (val.gsSites.length < 1) {
             var li = document.createElement('li');
-            li.innerHTML = "No Sites Saved";
+            li.innerHTML = "No sites saved yet. Use the form above or the extension pop up by clicking the icon in the chrome menu bar while browsing to add some!";
             ul.appendChild(li);
         } else {
             val.gsSites.forEach(function (el) {
                 var li = document.createElement('li');
-                li.innerHTML = el;
+                var itemText = `<button class="remove-button" data-site="${el}">X</button> ${el}`
+                li.innerHTML = itemText;
                 ul.appendChild(li);
             })
         }  
     });
 }
 
+// only options.js
 function clearSiteValues(tabs) {
-    chrome.storage.sync.get('gsSites', function (val) {
-        console.log('showing gsSites before clearing', val.gsSites);
-        chrome.storage.sync.set({ 'gsSites': [] });
-    });
+    if (confirm('Are you sure you want to remove all of your saved sites?')) {
+        chrome.storage.sync.get('gsSites', function (val) {
+            console.log('showing gsSites before clearing', val.gsSites);
+            chrome.storage.sync.set({ 'gsSites': [] });
+            updateOptionsSiteList();
+        });
+    }
 }
 
+// **************
+// URL Helpers
+// **************
+
+function getDomainFromTabs(tabs) {
+    var url = tabs[0].url;
+    var hostname = extractRootDomain(url);    
+    return hostname;
+}
 
 function extractHostname(url) {
     var hostname;
