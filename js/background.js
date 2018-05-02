@@ -20,10 +20,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 });
 
 // when user goes to new tab, we need to check the url and see if it's on the list, and change the icon based on that. maybe the grayscale as well? that way if you set one reddit tab, then go to another one it'll automatically switch without having to refresh
-chrome.tabs.onActivated.addListener(function (activeInfo) {
-  console.log('chrome.runtime', chrome.runtime.getURL('options.html'))
-  // var url = tab.url;
-  
+chrome.tabs.onActivated.addListener(function (activeInfo) {  
   console.log('tab changed activeinfo', activeInfo)
   chrome.storage.sync.get(['gsSites', 'gsAll'], function (val) {
     console.log('val.gsSites', val.gsSites);

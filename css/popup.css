@@ -1,0 +1,74 @@
+body {
+    margin: 0 10px 10px 10px;
+    width: 160px;
+}
+
+.preload *, .preload *:before, .preload *:after {
+    transition: none !important;
+}
+
+.container--options .add-remove-container, .container--options .manage-sites-container {       
+    display: none;
+}
+
+h1 {
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+}
+
+p, span, a, label {
+    font-size: 14px;
+    line-height: 1.25;
+    font-weight: 400;
+}
+
+.all-sites-container span {
+    margin-bottom: 7px;
+    display: inline-block;
+}
+
+.add-remove-container { 
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    padding: 9px 0 9px;    
+    margin: 5px 0;
+}
+
+.add-remove-container p {
+    margin: 0 0 6px;
+}
+
+.add-remove-container #add-site {
+    display: inline-block;
+}
+.add-remove-container #remove-site {
+    display: none;
+}
+.add-remove-container--remove #add-site {
+    display: none;
+}
+.add-remove-container--remove #remove-site {
+    display: inline-block;
+}
+
+.save-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 0;
+}
+
+.manage-sites-container {
+    padding-top: 5px;
+}
+
+.manage-sites {
+    color: #0375B4;
+    text-decoration: none;
+    transition: 0.3s color;
+}
+
+.manage-sites:hover, .manage-sites:focus {
+    color: #1587C6;
+    text-decoration: underline;
+}

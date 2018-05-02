@@ -23,13 +23,13 @@
 	],
 	"options_page": "options.html",
 	"icons": {
-		"128": "img/spip-on.png"		
+		"128": "img/gs-logo-on.png"		
 	},
 	"browser_action": {
 		"default_icon": {
-			"128": "img/spip-off.png"
+			"128": "img/gs-logo-off.png"
 		},
-		"default_title": "GrayScale Yay Scale",
+		"default_title": "GrayScale",
 		"default_popup": "popup.html"
 	},
 	"permissions": [

@@ -21,6 +21,10 @@ function checkCurrentSite(siteUrl) {
     });
 }
 
+// ****************************
+// Add saved sites
+// ****************************
+
 function addSite(site, tabs, callback) {
     chrome.storage.sync.get('gsSites', function (val) {
         console.log('gsSites', val)
@@ -60,12 +64,25 @@ function addSiteToList(e) {
     e.preventDefault();
     console.log('form go')
     var newSite = document.getElementById('new-site');
-    var newDomain = extractRootDomain(newSite.value);
-    addSite(newDomain, false, updateOptionsSiteList);
-    newSite.value = '';
-    newSite.blur();
-    newSite.focus();
+    var errorMessage = document.querySelector('.error-message');
+    if (/^[a-zA-Z0-9]{1,}\.[a-zA-Z]{2,}$/.test(newSite.value)) {
+        errorMessage.classList.remove('error-message--show');
+        var newDomain = extractRootDomain(newSite.value);
+        addSite(newDomain, false, updateOptionsSiteList);
+        newSite.value = '';
+        newSite.blur();
+        newSite.focus();
+    } else {
+        errorMessage.classList.add('error-message--show');
+        newSite.blur();
+        newSite.focus();
+    }
 }
+
+
+// ****************************
+// Remove saved sites
+// ****************************
 
 function removeSite(site, tabs, callback){
     chrome.storage.sync.get('gsSites', function (val) {
@@ -107,6 +124,26 @@ function removeSiteFromList(e) {
     removeSite(siteName, false, updateOptionsSiteList);
 }
 
+// ****************************
+// Toggle icon functions
+// ****************************
+
+function turnIconOn() {
+    chrome.browserAction.setIcon({
+        path: "../img/gs-logo-on.png"
+    });
+}
+
+function turnIconOff() {
+    chrome.browserAction.setIcon({
+        path: "../img/gs-logo-off.png"
+    });
+}
+
+// ****************************
+// Refresh options and popup pages
+// ****************************
+
 function updatePopUpDetails() {
     var checkbox = document.querySelector('.toggle');
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
@@ -115,6 +152,10 @@ function updatePopUpDetails() {
         siteTitle.innerHTML = hostname;
         var siteStatus = document.getElementById('site-status');
         var addRemoveContainer = document.querySelector('.add-remove-container');
+        var popUpContainer = document.querySelector('.container');
+        if (tabs[0].url === chrome.runtime.getURL('options.html')) {
+            popUpContainer.classList.add('container--options');
+        }
         chrome.storage.sync.get(['gsAll', 'gsSites'], function (val) {
             if (val.gsAll) {
                 checkbox.checked = true;
@@ -122,40 +163,20 @@ function updatePopUpDetails() {
                 checkbox.checked = false;
             }
             if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
-                siteStatus.innerHTML = 'is saved.<br>Remove this site?'
+                siteStatus.innerHTML = 'is saved.'
                 addRemoveContainer.classList.add('add-remove-container--remove');
             } else {
-                siteStatus.innerHTML = 'is not saved.<br>Save this site?'
+                siteStatus.innerHTML = 'is not saved.'
                 addRemoveContainer.classList.remove('add-remove-container--remove');
             }
         });
     });
 }
 
-// **************
-// Toggle icon functions
-// **************
-
-function turnIconOn() {
-    chrome.browserAction.setIcon({
-        path: "../img/spip-on.png"
-    });
-}
-
-function turnIconOff() {
-    chrome.browserAction.setIcon({
-        path: "../img/spip-off.png"
-    });
-}
-
-// **************
-// Clear and Show
-// **************
-
 // options.js, and here in others
 function updateOptionsSiteList() {
     chrome.storage.sync.get('gsSites', function (val) {
-        console.log('showing gsSites', val.gsSites);        
+        console.log('showing gsSites', val.gsSites);
         var ul = document.getElementById('site-list');
         ul.innerHTML = "";
 
@@ -170,9 +191,13 @@ function updateOptionsSiteList() {
                 li.innerHTML = itemText;
                 ul.appendChild(li);
             })
-        }  
+        }
     });
 }
+
+// ****************************
+// Clear sites
+// ****************************
 
 // only options.js
 function clearSiteValues(tabs) {

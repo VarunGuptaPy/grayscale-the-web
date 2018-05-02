@@ -1,6 +1,4 @@
 body {
-    font-family: "Lucida Grande", Tahoma, sans-serif;
-    font-size: 100%;
     margin: 0;  
 }
 
@@ -17,10 +15,21 @@ body {
 h1 {
     font-size: 20px;
     font-weight: 400;
+    margin-top: 17px;
 }
 p, span {
     font-size: 14px;
     line-height: 1.5;
+}
+
+.error-message {
+    color: #e23636;
+    margin-top: 8px;
+    display: none;
+}
+
+.error-message--show {
+    display: block;
 }
 
 #add-site-form {
@@ -47,34 +56,6 @@ p, span {
     border: 1px solid #1587C6;
 }
 
-.save-button {
-    display: inline-block;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-left: 2px;
-    border: 1px solid transparent;
-    font-size: 14px;
-    line-height: 35px;
-    border-radius: 5px;
-    cursor: pointer;
-    background: #0375B4;
-    color: #fff;
-    transition: 0.3s background-color;
-}
-
-.save-button:hover, .save-button:focus {
-    background: #1587C6;
-    outline: 0;
-} 
-
-.clear-button {
-    background-color: #e23636;
-}
-
-.clear-button:hover, .clear-button:focus {
-    background-color: #F44848;
-} 
-
 .remove-button {
     display: inline-block;
     padding: 0 5px;
@@ -98,7 +79,8 @@ ul {
 li {
     font-size: 14px;
     margin: 0;
-    padding: 7px 0;
+    padding: 8px 0;
+    line-height: 1.5;
     border-bottom: 1px solid lightgray;
 }
 li:last-of-type {
