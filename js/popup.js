@@ -1,15 +1,16 @@
-function updateStatus() {
-    var checkbox = document.querySelector('.toggle-all');
-    chrome.storage.sync.get(['gsAll', 'gsSites'], function (val) {
+function toggleAllSites() {
+    var checkbox = document.getElementById('all-sites-toggle');
+    chrome.storage.sync.get(['gsAll', 'gsSites', 'gsTabs'], function (val) {
         if (val.gsAll) {
             checkbox.checked = false;
             chrome.storage.sync.set({ 'gsAll': false });
-            // 'if site is added, don't remove it for this one'
+            // if site is added, don't remove it for this one
             chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
                 var hostname = getDomainFromTabs(tabs);
+                console.log('gsTabs', val.gsTabs)
                 // console.log('hostname in popup', hostname);
-                if (val.gsSites.indexOf(hostname) == -1) {
-                    console.log('its not there', val.gsSites.indexOf(hostname));
+                if (val.gsSites.indexOf(hostname) == -1 && val.gsTabs.indexOf(tabs[0].id) == -1) {
+                    console.log('its not there', val.gsSites.indexOf(hostname), val.gsTabs.indexOf(tabs[0].id));
                     chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
                     turnIconOff();
                 }
@@ -23,6 +24,34 @@ function updateStatus() {
             });
         }
     });
+}
+
+function toggleTab() {
+    console.log('toggle tab')
+    var checkbox = document.getElementById('this-tab-toggle');
+    chrome.storage.sync.get(['gsAll', 'gsSites', 'gsTabs'], function (val) {
+        if (checkbox.checked) {
+            console.log('checked')
+            // do callback here?            
+            // if ()
+            addCurrentTab();
+        } else {
+            console.log('not checked');
+            // if gsall and gssites are both not set            
+            // removeCurrentTab();
+            chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+                var hostname = getDomainFromTabs(tabs);
+                removeCurrentTab();
+                // console.log('gsSites', val.gsSites, 'gsAll', val.gsAll)
+                // if (val.gsSites.indexOf(hostname) == -1 && !val.gsAll) {
+                //     console.log('its not there', val.gsSites.indexOf(hostname), val.gsAll);
+                //     chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
+                //     turnIconOff();
+                // }
+            });
+        }
+    });
+    
 }
 
 function openOptionsPage() {
@@ -42,7 +71,9 @@ function onLoad() {
 }
 
 onLoad();
-document.querySelector('.toggle-all').addEventListener('change', updateStatus)
+
+document.getElementById('this-tab-toggle').addEventListener('change', toggleTab)
+document.getElementById('all-sites-toggle').addEventListener('change', toggleAllSites)
 
 document.getElementById('add-site').addEventListener('click', addCurrentSite)
 document.getElementById('remove-site').addEventListener('click', removeCurrentSite)

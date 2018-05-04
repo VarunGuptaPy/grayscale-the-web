@@ -1,6 +1,6 @@
-function checkCurrentSite(siteUrl) {
+function checkCurrentSite(currentSite, siteUrl) {
     console.log('check current site run')
-    chrome.storage.sync.get(['gsSites', 'gsAll'], function (val) {
+    chrome.storage.sync.get(['gsSites', 'gsAll', 'gsTabs'], function (val) {
         // console.log('val.gsSites', val.gsSites);
         // console.log('val.gsAll', val.gsAll);
         var hostname = extractRootDomain(siteUrl);
@@ -8,14 +8,21 @@ function checkCurrentSite(siteUrl) {
         if (val.gsAll) {
             console.log('turn on gray first')
             currentSite.querySelector('html').style.filter = "grayscale(100%)";
-        } else if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
+        }
+
+        // how to check tabs here?
+
+        // else if (val.gsTabs && val.gsTabs.indexOf(tabId) > -1) {
+        //     console.log('tab active')
+        //     currentSite.querySelector('html').style.filter = "grayscale(100%)";
+        // } 
+        else if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
             console.log('site active')
             console.log('turn on gray first')
             currentSite.querySelector('html').style.filter = "grayscale(100%)";
         } else {
             console.log('site not active')
             console.log('turn off gray first')
-            console.log('chrome.browserAction', chrome.browserAction)
             currentSite.querySelector('html').style.filter = "";
         }
     });
@@ -84,9 +91,10 @@ function addSiteToList(e) {
 // Remove saved sites
 // ****************************
 
+// need thing to check if all sites are on
 function removeSite(site, tabs, callback){
-    chrome.storage.sync.get('gsSites', function (val) {
-        console.log('gsSites', val);
+    chrome.storage.sync.get(['gsSites', 'gsAll', 'gsTabs'], function (val) {
+        console.log('gsSites in removeSite', val);
         if (!val.gsSites) {
             console.log('gsSites doesnt exist yet do nothing');
         } else if (val.gsSites.indexOf(site) > -1) {
@@ -100,7 +108,7 @@ function removeSite(site, tabs, callback){
                     callback()
                 }
             });
-            if (tabs) {
+            if (tabs && !val.gsAll && val.gsTabs.indexOf(tabs[0].id) == -1) {
                 chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
                 turnIconOff();
             }                        
@@ -125,6 +133,86 @@ function removeSiteFromList(e) {
 }
 
 // ****************************
+// Add saved Tabs
+// ****************************
+
+function addTab(tabId, callback) {
+    chrome.storage.sync.get('gsTabs', function (val) {
+        console.log('gsTabs', val)
+        if (!val.gsTabs || val.gsTabs.length < 1) {
+            console.log('gsTabs doesnt exist yet, lets add it');
+            chrome.storage.sync.set({ 'gsTabs': [tabId] }, function () {
+                callback();
+            });
+        } else if (val.gsTabs.indexOf(tabId) > -1) {
+            console.log('tab is already added there')
+        } else {
+            console.log('tab is not there, add it')
+            var newTabList = val.gsTabs;
+            newTabList.push(tabId);
+            console.log('newTabList', newTabList)
+            chrome.storage.sync.set({ 'gsTabs': newTabList }, function () {
+                callback();
+            });
+        }
+    });
+}
+
+function addCurrentTab() {
+    console.log('add current tab')
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        var tabId = tabs[0].id;
+        console.log('tabid', tabId)
+        addTab(tabId, function () {
+            chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
+            turnIconOn();
+            updatePopUpDetails();
+        });
+    });
+}
+
+// ****************************
+// Remove saved Tabs
+// ****************************
+
+// need thing to check if all sites are on
+function removeTab(tabId, hostname, callback) {
+    chrome.storage.sync.get(['gsSites', 'gsAll', 'gsTabs'], function (val) {
+        console.log('gsTabs in removeTabs', val);
+        if (!val.gsTabs) {
+            console.log('gsTabs doesnt exist yet do nothing');
+        } else if (val.gsTabs.indexOf(tabId) > -1) {
+            console.log('tab is already added there, remove it')
+            var newTabList = val.gsTabs;
+            var index = newTabList.indexOf(tabId);
+            newTabList.splice(index, 1);
+            console.log('newTabList', newTabList)
+            chrome.storage.sync.set({ 'gsTabs': newTabList }, function () {
+                if (val.gsSites.indexOf(hostname) == -1 && !val.gsAll) {
+                    console.log('should be good to make site color again');
+                    chrome.tabs.sendMessage(tabId, { type: 'turnOffGray' });
+                    turnIconOff();
+                }
+                if (callback) {
+                    callback()
+                }                
+            });
+        } else {
+            console.log('tab not there, do nothing')
+        }
+    });
+}
+
+function removeCurrentTab() {
+    console.log('remove current tab')
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        var hostname = getDomainFromTabs(tabs);
+        var tabId = tabs[0].id;        
+        removeTab(tabId, hostname, updatePopUpDetails);
+    });
+}
+
+// ****************************
 // Toggle icon functions
 // ****************************
 
@@ -145,7 +233,8 @@ function turnIconOff() {
 // ****************************
 
 function updatePopUpDetails() {
-    var checkbox = document.querySelector('.toggle');
+    var allSitesCheckbox = document.getElementById('all-sites-toggle');
+    var thisTabCheckbox = document.getElementById('this-tab-toggle');
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var hostname = getDomainFromTabs(tabs);
         var siteTitle = document.getElementById('site-name');
@@ -155,12 +244,22 @@ function updatePopUpDetails() {
         var popUpContainer = document.querySelector('.container');
         if (tabs[0].url === chrome.runtime.getURL('options.html')) {
             popUpContainer.classList.add('container--options');
-        }
-        chrome.storage.sync.get(['gsAll', 'gsSites'], function (val) {
+        }    
+        chrome.storage.sync.get(['gsAll', 'gsSites', 'gsTabs'], function (val) {
+            console.log('val.gsTabs', val.gsTabs)
+            console.log('tabs[0].id', tabs[0].id)
+            console.log('val.gsTabs.indexOf(tabs[0].id)', val.gsTabs.indexOf(tabs[0].id))
             if (val.gsAll) {
-                checkbox.checked = true;
+                allSitesCheckbox.checked = true;
             } else {
-                checkbox.checked = false;
+                allSitesCheckbox.checked = false;
+            }
+            if (val.gsTabs && val.gsTabs.indexOf(tabs[0].id) > -1) {
+                console.log('tab is on')
+                thisTabCheckbox.checked = true;
+            } else {
+                console.log('tab is off')
+                thisTabCheckbox.checked = false;
             }
             if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
                 siteStatus.innerHTML = 'is saved.'

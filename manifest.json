@@ -7,8 +7,7 @@
 	"background": {
 		"scripts": [
 			"js/manageSites.js", "js/background.js"
-		],
-		"persistent": false
+		]
 	},
 	"content_scripts": [
 		{
@@ -34,6 +33,7 @@
 	},
 	"permissions": [
 		"storage",
-		"tabs"
+		"tabs",
+		"webNavigation"
 	]
 }

@@ -23,7 +23,13 @@ p, span, a, label {
     font-weight: 400;
 }
 
-.all-sites-container span {
+.this-tab-container {
+    border-bottom: 1px solid lightgray;
+    padding-bottom: 9px;
+    margin-bottom: 5px;
+}
+
+.this-tab-container span, .all-sites-container span {
     margin-bottom: 7px;
     display: inline-block;
 }
