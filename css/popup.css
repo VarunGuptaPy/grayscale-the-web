@@ -41,20 +41,24 @@ p, span, a, label {
     margin: 5px 0;
 }
 
+#excluded-container {
+    border-top: 0;
+}
+
 .add-remove-container p {
     margin: 0 0 6px;
 }
 
-.add-remove-container #add-site {
+.add-remove-container .save-button {
     display: inline-block;
 }
-.add-remove-container #remove-site {
+.add-remove-container .clear-button {
     display: none;
 }
-.add-remove-container--remove #add-site {
+.add-remove-container--remove .save-button {
     display: none;
 }
-.add-remove-container--remove #remove-site {
+.add-remove-container--remove .clear-button {
     display: inline-block;
 }
 

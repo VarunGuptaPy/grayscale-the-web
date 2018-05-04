@@ -30,14 +30,23 @@
       </label>
     </div>    
     
-    <div class="add-remove-container">
+    <div id="saved-container" class="add-remove-container">
       <p>
-        <strong id="site-name" class="ellipsis"></strong>
-        <span id="site-status">is saved.</span>
+        <strong id="saved-site-name" class="ellipsis"></strong>
+        <span id="saved-site-status">is saved.</span>
       </p>
-      <button id="add-site" class="save-button">Save Site</button>
-      <button id="remove-site" class="save-button clear-button">Remove Site</button>
+      <button id="add-saved-site" class="save-button">Save Site</button>
+      <button id="remove-saved-site" class="save-button clear-button">Remove Site</button>
     </div>  
+
+    <div id="excluded-container" class="add-remove-container">
+      <p>
+        <strong id="excluded-site-name" class="ellipsis"></strong>
+        <span id="excluded-site-status">is excluded.</span>
+      </p>
+      <button id="add-excluded-site" class="save-button">Save Site</button>
+      <button id="remove-excluded-site" class="save-button clear-button">Remove Site</button>
+    </div>
     
     <div class="manage-sites-container">
       <a href="#" class="manage-sites">Manage Saved Sites</a>
