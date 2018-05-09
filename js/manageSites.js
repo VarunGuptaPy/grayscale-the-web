@@ -2,29 +2,6 @@
 // Add saved sites
 // ****************************
 
-// function addSite(site, tabs, callback) {
-//     chrome.storage.sync.get('gsSites', function (val) {
-//         console.log('val', val)
-//         if (!val.gsSites || val.gsSites.length < 1) {
-//             console.log('gsSites doesnt exist yet, lets add it');
-//             chrome.storage.sync.set({ 'gsSites': [site] }, function () {
-//                 callback();
-//             });
-//         } else if (val.gsSites.indexOf(site) > -1) {
-//             console.log('sites is already added there')
-//         } else {
-//             console.log('site not there, add it')
-//             var newSiteList = val.gsSites;
-//             newSiteList.push(site);
-//             newSiteList.sort();
-//             console.log('newSiteList', newSiteList)
-//             chrome.storage.sync.set({ 'gsSites': newSiteList }, function () {
-//                 callback();
-//             });
-//         }
-//     });
-// }
-
 function addSite(type, site, tabs, callback) {
     var paramObj;
     chrome.storage.sync.get(['gsSites', 'gsExcluded', 'gsTabs', 'gsAll'], function (val) {
@@ -70,9 +47,10 @@ function addCurrentSiteExcluded() {
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var hostname = getDomainFromTabs(tabs);
         addSite('gsExcluded', hostname, tabs, function (gsAll, gsTabs, gsSites) {
-            if (!gsAll && gsTabs.indexOf(tabs[0].id) == - 1 && gsSites.indexOf(hostname) == -1) {
-                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
-                turnIconOn();
+            if ((gsAll || gsTabs.indexOf(tabs[0].id) > -1) && gsSites.indexOf(hostname) == -1) {
+                console.log('heyoooooo')
+                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
+                turnIconOff();
             }
             updatePopUpDetails();
         });
@@ -137,13 +115,9 @@ function removeSite(type, site, tabs, callback) {
             paramObj[type] = newSiteList;
             chrome.storage.sync.set(paramObj, function () {
                 if (callback) {
-                    callback()
+                    callback(val.gsAll, val.gsTabs, val.gsSites);
                 }
             });
-            if (tabs && !val.gsAll && val.gsTabs.indexOf(tabs[0].id) == -1 && val.gsSites.indexOf(site) == -1) {
-                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
-                turnIconOff();
-            }
         } else {
             console.log('site not there, do nothing')
         }
@@ -159,12 +133,19 @@ function removeCurrentSite() {
     });
 }
 
+
 function removeCurrentSiteExcluded() {
     console.log('remove current site excluded')
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var url = tabs[0].url;
         var hostname = extractRootDomain(url);
-        removeSite('gsExcluded', hostname, tabs, updatePopUpDetails);
+        removeSite('gsExcluded', hostname, tabs, function (gsAll, gsTabs, gsSites) {
+            if ((gsAll || gsTabs.indexOf(tabs[0].id) > -1) && gsSites.indexOf(hostname) == -1) {                
+                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
+                turnIconOn();
+            }
+            updatePopUpDetails();
+        });
     });
 }
 
