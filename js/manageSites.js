@@ -102,7 +102,7 @@ function addExcludedSiteToList(e) {
 
 function removeSite(type, site, tabs, callback) {
     chrome.storage.sync.get(['gsSites', 'gsAll', 'gsTabs', 'gsExcluded'], function (val) {
-        console.log(type + ' in removeSite', val);
+        // console.log(type + ' in removeSite', val);
         if (!val[type]) {
             console.log(type + ' doesnt exist yet do nothing');
         } else if (val[type].indexOf(site) > -1) {
@@ -110,7 +110,7 @@ function removeSite(type, site, tabs, callback) {
             var newSiteList = val[type];
             var index = newSiteList.indexOf(site);
             newSiteList.splice(index, 1);
-            console.log('newSiteList', newSiteList)
+            // console.log('newSiteList', newSiteList)
             var paramObj = {};
             paramObj[type] = newSiteList;
             chrome.storage.sync.set(paramObj, function () {
@@ -129,10 +129,15 @@ function removeCurrentSite() {
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var url = tabs[0].url;
         var hostname = extractRootDomain(url);
-        removeSite('gsSites', hostname, tabs, updatePopUpDetails);
+        removeSite('gsSites', hostname, tabs, function (gsAll, gsTabs, gsSites) {
+            if (!gsAll && gsTabs.indexOf(tabs[0].id) == -1) {
+                chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
+                turnIconOff();
+            }
+            updatePopUpDetails();
+        });
     });
 }
-
 
 function removeCurrentSiteExcluded() {
     console.log('remove current site excluded')
@@ -263,16 +268,31 @@ function turnIconOff() {
 // Refresh options and popup pages
 // ****************************
 
+var toggleHelp = function (e) {    
+    var toggle = e.target;
+    var helpText = e.target.parentElement.parentElement.querySelector('.button-info__description');
+    if (helpText.classList.contains('button-info__description--show')) {
+        toggle.innerHTML = '<span>?</span>';
+        helpText.classList.remove('button-info__description--show')
+    } else {
+        toggle.innerHTML = '<span>X</span>';
+        helpText.classList.add('button-info__description--show')
+    }
+};
+
+function toggleExcludedHelp() {
+    var helpContainer = document.getElementById('excluded-description');
+    helpContainer.classList.toggle('button-info__description--show');
+}
+
 function updatePopUpDetails() {
     var allSitesCheckbox = document.getElementById('all-sites-toggle');
     var thisTabCheckbox = document.getElementById('this-tab-toggle');
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var hostname = getDomainFromTabs(tabs);
         
-        var savedSiteTitle = document.getElementById('saved-site-name');
-        var excludedSiteTitle = document.getElementById('excluded-site-name');
-        savedSiteTitle.innerHTML = hostname;
-        excludedSiteTitle.innerHTML = hostname;
+        var siteTitle = document.getElementById('current-site-name');
+        siteTitle.innerHTML = hostname;
         
         var savedSiteStatus = document.getElementById('saved-site-status');
         var excludedSiteStatus = document.getElementById('excluded-site-status');
@@ -285,41 +305,41 @@ function updatePopUpDetails() {
             popUpContainer.classList.add('container--options');
         }    
         chrome.storage.sync.get(['gsAll', 'gsExcluded', 'gsSites', 'gsTabs'], function (val) {
-            console.log('val', val)
-            console.log('val.gsTabs', val.gsTabs)
-            console.log('tabs[0].id', tabs[0].id)
+            // console.log('val', val)
+            // console.log('val.gsTabs', val.gsTabs)
+            // console.log('tabs[0].id', tabs[0].id)
             // console.log('val.gsTabs.indexOf(tabs[0].id)', val.gsTabs.indexOf(tabs[0].id))
-            console.log('hostname', hostname);
-            console.log('val.gsSites', val.gsSites)
-            console.log('val.gsSites.indexOf(hostname)', val.gsSites.indexOf(hostname))
+            // console.log('hostname', hostname);
+            // console.log('val.gsSites', val.gsSites)
+            // console.log('val.gsSites.indexOf(hostname)', val.gsSites.indexOf(hostname))
             if (val.gsAll) {
                 allSitesCheckbox.checked = true;
             } else {
                 allSitesCheckbox.checked = false;
             }
             if (val.gsTabs && val.gsTabs.indexOf(tabs[0].id) > -1) {
-                console.log('tab is on')
+                // console.log('tab is on')
                 thisTabCheckbox.checked = true;
             } else {
-                console.log('tab is off')
+                // console.log('tab is off')
                 thisTabCheckbox.checked = false;
             }
             if (val.gsSites && val.gsSites.indexOf(hostname) > -1) {
-                console.log('site is saved')
-                savedSiteStatus.innerHTML = 'is saved.'
+                // console.log('site is saved')
+                savedSiteStatus.innerHTML = 'Saved.'
                 savedAddRemoveContainer.classList.add('add-remove-container--remove');
             } else {
-                console.log('site is not saved')
-                savedSiteStatus.innerHTML = 'is not saved.'
+                // console.log('site is not saved')
+                savedSiteStatus.innerHTML = 'Not saved.'
                 savedAddRemoveContainer.classList.remove('add-remove-container--remove');
             }
             if (val.gsExcluded && val.gsExcluded.indexOf(hostname) > -1) {
-                console.log('site is excluded')
-                excludedSiteStatus.innerHTML = 'is excluded.'
+                // console.log('site is excluded')
+                excludedSiteStatus.innerHTML = 'Excluded.'
                 excludedAddRemoveContainer.classList.add('add-remove-container--remove');
             } else {
-                console.log('site is not excluded')
-                excludedSiteStatus.innerHTML = 'is not excluded.'
+                // console.log('site is not excluded')
+                excludedSiteStatus.innerHTML = 'Not excluded.'
                 excludedAddRemoveContainer.classList.remove('add-remove-container--remove');
             }
         });

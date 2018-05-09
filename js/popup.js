@@ -105,8 +105,10 @@ document.getElementById('all-sites-toggle').addEventListener('change', toggleAll
 
 document.getElementById('add-saved-site').addEventListener('click', addCurrentSite)
 document.getElementById('remove-saved-site').addEventListener('click', removeCurrentSite)
+document.getElementById('saved-help-toggle').addEventListener('click', toggleHelp);
 
 document.getElementById('add-excluded-site').addEventListener('click', addCurrentSiteExcluded)
 document.getElementById('remove-excluded-site').addEventListener('click', removeCurrentSiteExcluded)
+document.getElementById('excluded-help-toggle').addEventListener('click', toggleHelp);
 
 document.querySelector('.manage-sites').addEventListener('click', openOptionsPage)

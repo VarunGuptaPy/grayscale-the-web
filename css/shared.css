@@ -3,6 +3,16 @@ body {
     font-size: 100%;
 }
 
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 .ellipsis {
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -25,17 +35,20 @@ body {
     transition: 0.3s background-color;
 }
 
-.save-button:hover, .save-button:focus {
+.save-button:hover {
     background: #1587C6;
-    outline: 0;
 } 
 
 .clear-button {
     background-color: #e23636;
 }
 
-.clear-button:hover, .clear-button:focus {
+.clear-button:hover {
     background-color: #F44848;
+} 
+
+.save-button:focus, .clear-button:focus {
+    outline: 0;
 } 
 
 .toggle {
