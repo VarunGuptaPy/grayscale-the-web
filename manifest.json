@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
-	"name": "GrayScale - Save Sites",
-	"description": "Save sites you would like to appear as grayscale.",
+	"name": "Grayscale the Web - Save Sites",
+	"description": "Removes all color from websites. Can be set for specific sites, tabs, or for all sites.",
 	"version": "1.0",
 	"author": "Kyle Damken",
 	"background": {
@@ -21,14 +21,20 @@
 		}
 	],
 	"options_page": "options.html",
-	"icons": {
-		"128": "img/gs-logo-on.png"		
+	"icons": {		
+		"16": "img/16-gs-icon-on.png",
+		"32": "img/32-gs-icon-on.png",
+		"48": "img/48-gs-icon-on.png",
+		"128": "img/128-gs-icon-on.png"
 	},
 	"browser_action": {
 		"default_icon": {
-			"128": "img/gs-logo-off.png"
+			"16": "img/16-gs-icon-off.png",
+			"32": "img/32-gs-icon-off.png",
+			"48": "img/48-gs-icon-off.png",
+			"128": "img/128-gs-icon-off.png"			
 		},
-		"default_title": "GrayScale",
+		"default_title": "GrayScale the Web",
 		"default_popup": "popup.html"
 	},
 	"permissions": [

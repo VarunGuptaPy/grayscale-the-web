@@ -47,11 +47,6 @@ p, span, a, label {
     padding-left: 10px;
 }
 
-.this-tab-container span, .all-sites-container span {
-    margin-bottom: 7px;
-    display: inline-block;
-}
-
 /****************************
 // Save/Exclude Site
 ****************************/

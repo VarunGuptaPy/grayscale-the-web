@@ -254,13 +254,23 @@ function removeCurrentTab() {
 
 function turnIconOn() {
     chrome.browserAction.setIcon({
-        path: "../img/gs-logo-on.png"
+        path: {
+            "16": "../img/16-gs-icon-on.png",
+            "32": "../img/32-gs-icon-on.png",
+            "48": "../img/48-gs-icon-on.png",
+            "128": "../img/128-gs-icon-on.png"
+        }
     });
 }
 
 function turnIconOff() {
     chrome.browserAction.setIcon({
-        path: "../img/gs-logo-off.png"
+        path: {
+            "16": "../img/16-gs-icon-off.png",
+            "32": "../img/32-gs-icon-off.png",
+            "48": "../img/48-gs-icon-off.png",
+            "128": "../img/128-gs-icon-off.png"
+        }
     });
 }
 
@@ -348,11 +358,13 @@ function updatePopUpDetails() {
 
 // options.js, and here in others
 function updateOptionsSiteList() {
-    chrome.storage.sync.get(['gsSites', 'gsExcluded'], function (val) {
+    chrome.storage.sync.get(['gsSites', 'gsExcluded', 'gsBgToggle'], function (val) {
         console.log('showing gsSites', val.gsSites)
         console.log('showing gsExcluded', val.gsExcluded);
+        console.log('showing gsBgToggle', val.gsBgToggle);
         var savedUl = document.getElementById('saved-site-list');
         var excludedUl = document.getElementById('excluded-site-list');
+        var bgToggle = document.getElementById('background-toggle');
         savedUl.innerHTML = "";
         excludedUl.innerHTML = "";
 
@@ -380,6 +392,12 @@ function updateOptionsSiteList() {
                 excludedLi.innerHTML = itemText;
                 excludedUl.appendChild(excludedLi);
             })
+        }
+
+        if (val.gsBgToggle) {
+            bgToggle.checked = true;
+        } else {
+            bgToggle.checked = false;
         }
     });
 }

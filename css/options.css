@@ -90,3 +90,8 @@ li {
 li:last-of-type {
     border: 0;
 }
+
+.background-toggle-section-container {
+    border-top: 1px solid lightgray;
+    margin-top: 20px;
+}

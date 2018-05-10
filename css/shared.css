@@ -98,3 +98,8 @@ body {
 .toggle:checked:before {
     left: 32px;
 }
+
+.toggle-container span {
+    margin-bottom: 7px;
+    display: inline-block;
+}
