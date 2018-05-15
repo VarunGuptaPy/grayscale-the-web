@@ -6,16 +6,17 @@ chrome.storage.sync.set({ 'gsTabs': [] });
 function grayToggle(info) {
   chrome.storage.sync.get(['gsSites', 'gsExcluded', 'gsAll', 'gsTabs'], function (val) {
     console.log('val.gsSites', val.gsSites);
+    console.log('val.gsExcluded', val.gsExcluded);
     console.log('val.gsAll', val.gsAll);
     console.log('val.gsTabs', val.gsTabs);
-    var tabId = info.tabId < 0 ? 0 : info.tabId;
-    if (info.tabId > 0) {
-      chrome.tabs.get(info.tabId, function (tab) {
-        console.log('tab.id is', tab.id);
-        console.log('val.gsTabs.indexOf(tab.id)', val.gsTabs.indexOf(tab.id))
-        var url = tab.url;
-        var hostname = extractRootDomain(url);
-        console.log('activated url', hostname)
+    console.log('tabid', info.tabId)
+    chrome.tabs.get(info.tabId, function (tab) {
+      console.log('chrome.tabs.get ran!!!!', tab)
+      var url = tab.url;
+      var hostname = extractRootDomain(url);
+      console.log('activated url', hostname)
+      if (tab.id !== -1) {
+        console.log('good to check')
         // check if options page
         if (url === chrome.runtime.getURL('options.html')) {
           console.log('on the options page');
@@ -59,10 +60,10 @@ function grayToggle(info) {
           chrome.tabs.sendMessage(tab.id, { type: 'turnOffGray' });
           turnIconOff();
         }
-      });
-    } else {
-      console.log('low tabid')
-    }
+      } else {
+        console.log('bad to check')
+      }  
+    });    
   });
 }
 
@@ -76,10 +77,10 @@ chrome.webNavigation.onCommitted.addListener(function (info) {
 //   console.log('info', info)
 // });
 
-chrome.tabs.onUpdated.addListener(function (tabId, info) {
+// chrome.tabs.onUpdated.addListener(function (tabId, info) {
   // console.log('**************** on completed ****************');
   // grayToggle(info);  
-});
+// });
 
 chrome.tabs.onActivated.addListener(function (info) {  
   console.log('**************** on tab activated ****************');
