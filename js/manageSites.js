@@ -402,6 +402,23 @@ function updateOptionsSiteList() {
     });
 }
 
+function toggleBackground() {
+    console.log('toggle background image/color');
+    var checkbox = document.getElementById('background-toggle');
+    chrome.storage.sync.get(['gsBgToggle'], function (val) {
+        console.log('gsBgToggle', val.gsBgToggle);
+        if (val.gsBgToggle) {
+            console.log('checked, turn if off')
+            chrome.storage.sync.set({ 'gsBgToggle': false });
+            checkbox.checked = false;
+        } else {
+            console.log('not checked, turn it on');
+            chrome.storage.sync.set({ 'gsBgToggle': true });
+            checkbox.checked = true;
+        }
+    });
+}
+
 // ****************************
 // Clear sites
 // ****************************

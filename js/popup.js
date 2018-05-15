@@ -1,15 +1,14 @@
 function toggleAllSites() {
+    // console.log('toggle all sites')
     var checkbox = document.getElementById('all-sites-toggle');
     chrome.storage.sync.get(['gsAll', 'gsExcluded', 'gsSites', 'gsTabs'], function (val) {
         chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
             var hostname = getDomainFromTabs(tabs);
-            console.log('gsTabs', val.gsTabs)
-
             if (val.gsAll) {
                 checkbox.checked = false;
                 chrome.storage.sync.set({ 'gsAll': false });
                 if (val.gsSites.indexOf(hostname) == -1 && val.gsTabs.indexOf(tabs[0].id) == -1) {
-                    console.log('its not there', val.gsSites.indexOf(hostname), val.gsTabs.indexOf(tabs[0].id));
+                    // console.log('tab not on and site not saved, turn off gray');
                     chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
                     turnIconOff();
                 }
@@ -17,24 +16,24 @@ function toggleAllSites() {
                 checkbox.checked = true;
                 chrome.storage.sync.set({ 'gsAll': true });
                 if (val.gsExcluded.indexOf(hostname) == -1) {
+                    // console.log('site not excluded, turn on gray');
                     chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOnGray' });
                     turnIconOn();
                 }                
             }
         });
-        
     });
 }
 
 function toggleTab() {
-    console.log('toggle tab')
+    // console.log('toggle tab')
     var checkbox = document.getElementById('this-tab-toggle');
     chrome.storage.sync.get(['gsAll', 'gsExcluded', 'gsSites', 'gsTabs'], function (val) {
         if (checkbox.checked) {
-            console.log('checked');
+            // console.log('toggle tab checked');
             addCurrentTab();
         } else {
-            console.log('not checked');
+            // console.log('toggle tab not checked');
             chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
                 var hostname = getDomainFromTabs(tabs);
                 removeCurrentTab();

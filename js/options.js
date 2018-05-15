@@ -1,32 +1,12 @@
-var savedSites = ['reddit.com', 'ebay.com', 'facebook.com'];
-
 updateOptionsSiteList();
 
 chrome.extension.onMessage.addListener(function (request, sender, response) {
-    console.log('message received')
+    // console.log('message received')
     if (request.type === 'refreshOptions') {
-        console.log('options message')
+        // console.log('refreshOptions message')
         updateOptionsSiteList();
     }
 });
-
-function toggleBackground() {
-    console.log('toggle background');
-    var checkbox = document.getElementById('background-toggle');
-    chrome.storage.sync.get(['gsBgToggle'], function (val) {
-        console.log('gsBgToggle', val.gsBgToggle);
-        if (val.gsBgToggle) {
-            console.log('checked')
-            chrome.storage.sync.set({'gsBgToggle': false});
-            checkbox.checked = false;
-        } else {
-            console.log('not checked');
-            chrome.storage.sync.set({ 'gsBgToggle': true });
-            checkbox.checked = true;
-        }
-    });
-
-}
 
 document.getElementById('saved-site-list').addEventListener('click', removeSiteFromList)
 
