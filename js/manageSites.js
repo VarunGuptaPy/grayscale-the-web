@@ -1,26 +1,25 @@
 // ****************************
-// Add saved sites
+// Add saved and excluded sites
 // ****************************
 
 function addSite(type, site, tabs, callback) {
     var paramObj;
     chrome.storage.sync.get(['gsSites', 'gsExcluded', 'gsTabs', 'gsAll'], function (val) {
-        console.log('val', val)
+        // console.log(type + ' in addSite', val);
         if (!val[type] || val[type].length < 1) {
-            console.log(type + ' doesnt exist yet, lets add it');
+            // console.log(type + ' doesnt exist yet, lets add it');
             paramObj = {};
             paramObj[type] = [site];
             chrome.storage.sync.set(paramObj, function () {
                 callback(val.gsAll, val.gsTabs, val.gsSites);
             });
         } else if (val[type].indexOf(site) > -1) {
-            console.log(type + 'sites is already added there')
+            // console.log(type + 'sites is already added there')
         } else {
-            console.log(type + 'site not there, add it')
+            // console.log(type + 'site not there, add it')
             var newSiteList = val[type];
             newSiteList.push(site);
             newSiteList.sort();
-            console.log('newSiteList', newSiteList)
             paramObj = {};
             paramObj[type] = newSiteList
             chrome.storage.sync.set(paramObj, function () {
@@ -31,7 +30,7 @@ function addSite(type, site, tabs, callback) {
 }
 
 function addCurrentSite() {
-    console.log('add current site')
+    // console.log('add current site');
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var hostname = getDomainFromTabs(tabs);
         addSite('gsSites', hostname, tabs, function () {
@@ -43,12 +42,11 @@ function addCurrentSite() {
 }
 
 function addCurrentSiteExcluded() {
-    console.log('add current site excluded')
+    // console.log('add current site excluded');
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var hostname = getDomainFromTabs(tabs);
         addSite('gsExcluded', hostname, tabs, function (gsAll, gsTabs, gsSites) {
             if ((gsAll || gsTabs.indexOf(tabs[0].id) > -1) && gsSites.indexOf(hostname) == -1) {
-                console.log('heyoooooo')
                 chrome.tabs.sendMessage(tabs[0].id, { type: 'turnOffGray' });
                 turnIconOff();
             }
@@ -59,7 +57,7 @@ function addCurrentSiteExcluded() {
 
 function addSiteToList(e) {
     e.preventDefault();
-    console.log('form go')
+    // console.log('addSiteToList form')
     var newSite = document.getElementById('new-site');
     var errorMessage = document.getElementById('save-site-error');
     if (/^[a-zA-Z0-9]{1,}\.[a-zA-Z]{2,}$/.test(newSite.value)) {
@@ -78,7 +76,7 @@ function addSiteToList(e) {
 
 function addExcludedSiteToList(e) {
     e.preventDefault();
-    console.log('excluded form go')
+    // console.log('addExcludedSiteToList form');
     var newSite = document.getElementById('new-excluded-site');
     var errorMessage = document.getElementById('excluded-site-error');
     if (/^[a-zA-Z0-9]{1,}\.[a-zA-Z]{2,}$/.test(newSite.value)) {
@@ -97,14 +95,14 @@ function addExcludedSiteToList(e) {
 
 
 // ****************************
-// Remove saved sites
+// Remove saved and excluded sites
 // ****************************
 
 function removeSite(type, site, tabs, callback) {
     chrome.storage.sync.get(['gsSites', 'gsAll', 'gsTabs', 'gsExcluded'], function (val) {
         // console.log(type + ' in removeSite', val);
         if (!val[type]) {
-            console.log(type + ' doesnt exist yet do nothing');
+            // console.log(type + ' doesnt exist yet do nothing');
         } else if (val[type].indexOf(site) > -1) {
             console.log(type + ' sites is already added there, remove it')
             var newSiteList = val[type];
@@ -119,13 +117,13 @@ function removeSite(type, site, tabs, callback) {
                 }
             });
         } else {
-            console.log('site not there, do nothing')
+            // console.log('site not there, do nothing')
         }
     });
 }
 
 function removeCurrentSite() {
-    console.log('remove current site')
+    // console.log('remove current site')
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var url = tabs[0].url;
         var hostname = extractRootDomain(url);
@@ -140,7 +138,7 @@ function removeCurrentSite() {
 }
 
 function removeCurrentSiteExcluded() {
-    console.log('remove current site excluded')
+    // console.log('remove current site excluded')
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var url = tabs[0].url;
         var hostname = extractRootDomain(url);
@@ -165,26 +163,25 @@ function removeExcludedSiteFromList(e) {
 }
 
 // ****************************
-// Add saved Tabs
+// Add saved tabs
 // ****************************
 
 function addTab(tabId, hostname, callback) {
     chrome.storage.sync.get(['gsTabs', 'gsExcluded'], function (val) {
-        console.log('gsTabs', val)
+        // console.log('addTab', val)
         if (!val.gsTabs || val.gsTabs.length < 1) {
-            console.log('gsTabs doesnt exist yet, lets add it');
+            // console.log('gsTabs doesnt exist yet, lets add it');
             chrome.storage.sync.set({ 'gsTabs': [tabId] }, function () {
                 if (val.gsExcluded.indexOf(hostname) == -1) {
                     callback();
                 }                
             });
         } else if (val.gsTabs.indexOf(tabId) > -1) {
-            console.log('tab is already added there')
+            // console.log('tab is already added there')
         } else {
-            console.log('tab is not there, add it')
+            // console.log('tab is not there, add it')
             var newTabList = val.gsTabs;
             newTabList.push(tabId);
-            console.log('newTabList', newTabList)
             chrome.storage.sync.set({ 'gsTabs': newTabList }, function () {
                 if (val.gsExcluded.indexOf(hostname) == -1) {
                     callback();
@@ -195,7 +192,7 @@ function addTab(tabId, hostname, callback) {
 }
 
 function addCurrentTab() {
-    console.log('add current tab')
+    // console.log('add current tab')
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var tabId = tabs[0].id;
         var hostname = getDomainFromTabs(tabs);
@@ -211,21 +208,19 @@ function addCurrentTab() {
 // Remove saved Tabs
 // ****************************
 
-// need thing to check if all sites are on
 function removeTab(tabId, hostname, callback) {
     chrome.storage.sync.get(['gsSites', 'gsAll', 'gsTabs'], function (val) {
-        console.log('gsTabs in removeTabs', val);
+        // console.log('removeTabs', val);
         if (!val.gsTabs) {
-            console.log('gsTabs doesnt exist yet do nothing');
+            // console.log('gsTabs doesnt exist yet do nothing');
         } else if (val.gsTabs.indexOf(tabId) > -1) {
-            console.log('tab is already added there, remove it')
+            // console.log('tab is already added there, remove it')
             var newTabList = val.gsTabs;
             var index = newTabList.indexOf(tabId);
             newTabList.splice(index, 1);
-            console.log('newTabList', newTabList)
             chrome.storage.sync.set({ 'gsTabs': newTabList }, function () {
                 if (val.gsSites.indexOf(hostname) == -1 && !val.gsAll) {
-                    console.log('should be good to make site color again');
+                    // console.log('should be good to make site color again');
                     chrome.tabs.sendMessage(tabId, { type: 'turnOffGray' });
                     turnIconOff();
                 }
@@ -234,13 +229,13 @@ function removeTab(tabId, hostname, callback) {
                 }                
             });
         } else {
-            console.log('tab not there, do nothing')
+            // console.log('tab not there, do nothing')
         }
     });
 }
 
 function removeCurrentTab() {
-    console.log('remove current tab')
+    // console.log('remove current tab')
     chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
         var hostname = getDomainFromTabs(tabs);
         var tabId = tabs[0].id;        
@@ -249,7 +244,7 @@ function removeCurrentTab() {
 }
 
 // ****************************
-// Toggle icon functions
+// Toggle icons
 // ****************************
 
 function turnIconOn() {
@@ -318,10 +313,8 @@ function updatePopUpDetails() {
             // console.log('val', val)
             // console.log('val.gsTabs', val.gsTabs)
             // console.log('tabs[0].id', tabs[0].id)
-            // console.log('val.gsTabs.indexOf(tabs[0].id)', val.gsTabs.indexOf(tabs[0].id))
-            // console.log('hostname', hostname);
             // console.log('val.gsSites', val.gsSites)
-            // console.log('val.gsSites.indexOf(hostname)', val.gsSites.indexOf(hostname))
+            // console.log('hostname', hostname);            
             if (val.gsAll) {
                 allSitesCheckbox.checked = true;
             } else {
@@ -359,9 +352,9 @@ function updatePopUpDetails() {
 // options.js, and here in others
 function updateOptionsSiteList() {
     chrome.storage.sync.get(['gsSites', 'gsExcluded', 'gsBgToggle'], function (val) {
-        console.log('showing gsSites', val.gsSites)
-        console.log('showing gsExcluded', val.gsExcluded);
-        console.log('showing gsBgToggle', val.gsBgToggle);
+        // console.log('gsSites', val.gsSites)
+        // console.log('gsExcluded', val.gsExcluded);
+        // console.log('gsBgToggle', val.gsBgToggle);
         var savedUl = document.getElementById('saved-site-list');
         var excludedUl = document.getElementById('excluded-site-list');
         var bgToggle = document.getElementById('background-toggle');
@@ -403,16 +396,16 @@ function updateOptionsSiteList() {
 }
 
 function toggleBackground() {
-    console.log('toggle background image/color');
+    // console.log('toggle background image/color');
     var checkbox = document.getElementById('background-toggle');
     chrome.storage.sync.get(['gsBgToggle'], function (val) {
         console.log('gsBgToggle', val.gsBgToggle);
         if (val.gsBgToggle) {
-            console.log('checked, turn if off')
+            // console.log('checked, turn if off')
             chrome.storage.sync.set({ 'gsBgToggle': false });
             checkbox.checked = false;
         } else {
-            console.log('not checked, turn it on');
+            // console.log('not checked, turn it on');
             chrome.storage.sync.set({ 'gsBgToggle': true });
             checkbox.checked = true;
         }
@@ -427,7 +420,7 @@ function toggleBackground() {
 function clearSiteValues(tabs) {
     if (confirm('Are you sure you want to remove all of your saved sites?')) {
         chrome.storage.sync.get('gsSites', function (val) {
-            console.log('showing gsSites before clearing', val.gsSites);
+            // console.log('showing gsSites before clearing', val.gsSites);
             chrome.storage.sync.set({ 'gsSites': [] });
             updateOptionsSiteList();
         });
@@ -437,7 +430,7 @@ function clearSiteValues(tabs) {
 function clearExcludedSiteValues(tabs) {
     if (confirm('Are you sure you want to remove all of your excluded sites?')) {
         chrome.storage.sync.get('gsExcluded', function (val) {
-            console.log('showing gsExcluded before clearing', val.gsExcluded);
+            // console.log('showing gsExcluded before clearing', val.gsExcluded);
             chrome.storage.sync.set({ 'gsExcluded': [] });
             updateOptionsSiteList();
         });
