@@ -1,8 +1,9 @@
 {
 	"manifest_version": 2,
 	"name": "Grayscale the Web - Save Sites",
-	"description": "Removes all color from websites, turning them gray. Can be set for specific sites, tabs, or for all sites.",
-	"version": "1.0",
+	"short_name": "Gray the Web",
+	"description": "Removes all color from websites, turning them gray. Can be set for specific sites and tabs, or for all sites.",
+	"version": "1.0.3",
 	"author": "Dev Astora",
 	"background": {
 		"scripts": [
