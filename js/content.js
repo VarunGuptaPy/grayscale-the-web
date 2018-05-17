@@ -1,5 +1,8 @@
 console.log('content script running')
 
+var console = {};
+console.log = function () {};
+
 chrome.extension.onMessage.addListener(function (request, sender, response) {
     console.log('content script message received')
     if (request.type === 'turnOnGray') {
