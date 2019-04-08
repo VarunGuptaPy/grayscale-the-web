@@ -1,105 +1,86 @@
 <!doctype html>
-<!--
- This page is shown when the extension button is clicked, because the
- "browser_action" field in manifest.json contains the "default_popup" key with
- value "popup.html".
- -->
 <html>
 
 <head>
-  <title>Grayscale - Save</title>
-  <style>
-    body {
-      font-family: "Lucida Grande", Tahoma, sans-serif;
-      font-size: 100%;
-      margin: 0 10px 10px 10px;
-      width: 118px;
-    }
-
-    .preload *, .preload *:before, .preload *:after {
-      transition: none !important;
-    }
-
-    h1 {
-      font-size: 16px;
-      font-weight: 400;
-    }
-
-    ul {
-      padding-left: 0;
-    }
-    li {
-      font-size: 12px;
-    }
-
-    .toggle {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 62px;
-      height: 32px;
-      display: inline-block;
-      position: relative;
-      margin: 0;
-      border-radius: 50px;
-      overflow: hidden;
-      outline: none;
-      border: none;
-      cursor: pointer;
-      background-color: #707070;
-      transition: background-color ease 0.3s;
-    }
-
-    .toggle:before {
-      content: "on off";
-      display: block;
-      position: absolute;
-      z-index: 2;
-      width: 28px;
-      height: 28px;
-      background: #fff;
-      left: 2px;
-      top: 2px;
-      border-radius: 50%;
-      font: 10px/28px Helvetica;
-      text-transform: uppercase;
-      font-weight: bold;
-      text-indent: -22px;
-      word-spacing: 37px;
-      color: #fff;
-      text-shadow: -1px -1px rgba(0, 0, 0, 0.15);
-      white-space: nowrap;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s;
-    }
-
-    .toggle:checked {
-      background-color: #1bb76e;
-    }
-
-    .toggle:checked:before {
-      left: 32px;
-    }
-  </style>
+  <title>Grayscale</title>
+  <link rel="stylesheet" type="text/css" href="css/shared.css">
+  <link rel="stylesheet" type="text/css" href="css/popup.css">
 </head>
 
 <body class="preload">
-  <h1>Grayscale - Save</h1>
+  <div class="container">
+    <h1>Grayscale the Web</h1>
 
-  For Just This Tab<br>
-  <!-- <input class="toggle" type="checkbox" checked/> -->
+    <div class="main-toggles-container clearfix">
+      <div class="this-tab-container toggle-container">
+        <label>
+          <span>For This Tab</span>
+          <br>
+          <input id="this-tab-toggle" class="toggle toggle-all" type="checkbox" checked/>
+        </label>
+      </div>
+      
+      <div class="all-sites-container toggle-container">
+        <label>
+          <span>For All Sites</span>
+          <br>
+          <input id="all-sites-toggle" class="toggle toggle-all" type="checkbox" checked/>
+        </label>
+      </div>
+    </div>       
+    
+    <div class="add-remove-main-container">
+      <p class="site-name">
+        Current Site:<br><strong id="current-site-name" class="ellipsis">Website Name</strong>
+      </p>
 
-  For All Sites<br>
-  <input class="toggle toggle-all" type="checkbox" checked/>
-  <br>
-  Save this site?<br>
-  <button class="add-site">Add Site</button>
-  <button class="remove-site">Remove Site</button>
-  <br>
-  Dev stuff<br>
-  <button class="show-site-values">Show Site Values</button>
-  <button class="clear-site-values">Clear Site Values</button>
+      <div id="excluded-container" class="add-remove-container">
+        <div class="button-info-container">
+          <div class="button-info__header">
+            <p id="excluded-info" class="button-info__title-container">
+              <span class="button-info__title">Excluded Status:
+                <span id="excluded-site-status"></span>
+              </span>
+            </p>
+            <button id="excluded-help-toggle" class="hide-show-button">
+              <span>?</span>
+            </button>
+          </div>
+          <p id="excluded-description" class="button-info__description">Excluded sites won't turn gray when<br>"For This Tab" or "For All Sites" mode<br>is on.</p>          
+        </div>      
 
-  <ul class="site-list"></ul>
+        <div class="button-container clearfix">
+          <button id="add-excluded-site" class="save-button">Exclude Site</button>
+          <button id="remove-excluded-site" class="save-button clear-button">Stop Excluding Site</button>
+        </div>        
+      </div>
+
+      <div id="saved-container" class="add-remove-container">
+        <div class="button-info-container">
+          <div class="button-info__header">
+            <p id="saved-info" class="button-info__title-container">
+              <span class="button-info__title">Saved Status:
+                <span id="saved-site-status"></span>
+              </span>
+            </p>
+            <button id="saved-help-toggle" class="hide-show-button">
+              <span>?</span>
+            </button>
+          </div>
+          <p id="saved-description" class="button-info__description">Saved sites will always appear gray, regardless of any other settings.</p>
+        </div>
+      
+        <div class="button-container clearfix">
+          <button id="add-saved-site" class="save-button">Save Site</button>
+          <button id="remove-saved-site" class="save-button clear-button">Remove Saved Site</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="manage-sites-container">
+      <a href="#" class="manage-sites">Manage Saved/Excluded Sites</a>
+    </div>  
+  </div>
 
   <script type="text/javascript" src="js/manageSites.js"></script>
   <script type="text/javascript" src="js/popup.js">
